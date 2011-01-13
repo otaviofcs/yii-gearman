@@ -1,0 +1,53 @@
+Это расширение позволяет регистрировать контроллеры и их действия в gearman.
+Пример использования:
+
+Добавляем компонент в конфиг приложения:
+<code>
+'gearmanManager'=>array(
+	'class'=>'GearmanManager',
+	'servers'=>array(
+		'192.168.56.101',
+	),
+	'routes' => array(
+		'reverse' => array('gearman','reverse'),
+	),
+),
+</code>
+
+Делаем контроллер:
+<code>
+<?php
+
+class GearmanController extends AbstractGearmanController
+{
+	public function actionReverse(GearmanJob $job)
+	{
+		return strrev($job);
+	}
+}
+</code>
+
+и добавляем входной скрипт, предназначенный для запуска воркера:
+<code>
+<?php
+// change the following paths if necessary
+$yii=dirname(__FILE__).'/../yii/yii.php';
+$config=dirname(__FILE__).'/protected/config/main.php';
+
+require_once($yii);
+// create application
+Yii::createWebApplication($config);
+// run gearman worker
+Yii::app()->gearmanManager->run();
+</code>
+
+Проверить работу можно при помощи следующего скрипта:
+<code>
+<?php
+$client = new GearmanClient();
+$client->addServer('192.168.56.101');
+
+//$result = $client->do("reverse", "string");
+$client->addTaskBackground("reverse", "string");
+$client->runTasks();
+</code>
