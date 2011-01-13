@@ -1,6 +1,6 @@
 <?php
 /**
- * File contains class GearmanAction
+ * File contains class AbstractGearmanAction
  *
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @link https://github.com/mitallast/yii-gearman
@@ -8,7 +8,7 @@
  */
 
 /**
- * Class GearmanAction is the base class for gearman controller action classes.
+ * Class AbstractGearmanAction is the base class for gearman controller action classes.
  *
  * @abstract
  * @author Alexey Korchevsky <mitallast@gmail.com>
@@ -16,7 +16,7 @@
  * @version 0.1
  * @since 0.1
  */
-abstract class GearmanAction extends CAction
+abstract class AbstractGearmanAction extends CAction
 {
 	private $_job;
 	/**

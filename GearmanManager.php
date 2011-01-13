@@ -107,7 +107,7 @@ class GearmanManager extends CApplicationComponent
 			$controller = $controllerRoute[0];
 			$actionRoute = $controllerRoute[1];
 
-			/** @var $action GearmanAction */
+			/** @var $action AbstractGearmanAction */
 			$action = $controller->createAction($actionRoute);
 			$action->setJob($job);
 			$returnData = $action->run();

@@ -8,14 +8,14 @@
  */
 
 /**
- * Class GearmanInlineAction is implementation of GearmanAction class for inline controller class actions.
+ * Class GearmanInlineAction is implementation of AbstractGearmanAction class for inline controller class actions.
  *
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @package ext.datamapper
  * @version 0.1
  * @since 0.1
  */
-class GearmanInlineAction extends GearmanAction
+class GearmanInlineAction extends AbstractGearmanAction
 {
 	/**
 	 * Runs gearman action.

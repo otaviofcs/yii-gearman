@@ -23,7 +23,7 @@ class AbstractGearmanController extends CController
 	 * The latter is created by looking up the action map specified in {@link actions}.
 	 * 
 	 * @param string $actionID ID of the action. If empty, the {@link defaultAction default action} will be used.
-	 * @return GearmanAction the action instance, null if the action does not exist.
+	 * @return AbstractGearmanAction the action instance, null if the action does not exist.
 	 * @see actions
 	 */
 	public function createAction($actionID)
