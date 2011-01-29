@@ -1,20 +1,22 @@
 <?php
 /**
-* File contains class WorkerInlineAction
-*
-* @author Alexey Korchevsky <mitallast@gmail.com>
-* @link https://github.com/mitallast/yii-worker
-* @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
-*/
+ * File contains class WorkerInlineAction
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @link https://github.com/mitallast/yii-gearman
+ * @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
+ */
 
 /**
-* Class WorkerInlineAction
-*
-* @author Alexey Korchevsky <mitallast@gmail.com>
-* @package ext.worker
-* @version 0.1 15.01.11 15:35
-* @since 0.1
-*/
+ * Class WorkerInlineAction represents an action that is defined as a controller method.
+ *
+ * The method name is like 'actionXYZ' where 'XYZ' stands for the action name.
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @package ext.worker
+ * @version 0.2
+ * @since 0.2
+ */
 class WorkerInlineAction extends AbstractWorkerAction
 {
 	/**

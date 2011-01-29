@@ -1,11 +1,11 @@
 <?php
 /**
-* File contains class WorkerApplication
-*
-* @author Alexey Korchevsky <mitallast@gmail.com>
-* @link https://github.com/mitallast/yii-worker
-* @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
-*/
+ * File contains class WorkerApplication
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @link https://github.com/mitallast/yii-gearman
+ * @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
+ */
 
 require_once "Interfaces.php";
 
@@ -19,10 +19,53 @@ require_once "Interfaces.php";
  *    <li>{@link router} Worker router, implements command to controller action routing.</li>
  * </ul>
  *
+ * Example of worker bootstrap script:
+ * <code>
+ * // change the following paths if necessary
+ * $yii=dirname(__FILE__).'/../yii/yii.php';
+ * $config=dirname(__FILE__).'/protected/config/worker.php';
+ *
+ * // remove the following lines when in production mode
+ * defined('YII_DEBUG') or define('YII_DEBUG',true);
+ *
+ * // specify how many levels of call stack should be shown in each log message
+ * defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL',3);
+ * require_once($yii);
+ * require_once(dirname(__FILE__).'/protected/extensions/worker/WorkerApplication.php');
+ *
+ * Yii::createApplication("WorkerApplication", $config)->run();
+ * </code>
+ *
+ * Example of worker config:
+ * <code>
+ * return array(
+ *     'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
+ *     'import'=>array(
+ *         'ext.worker.*',
+ *     ),
+ *     'components'=>array(
+ *         'worker'=>array(
+ *             'class'=>'WorkerDaemon',
+ *             'servers'=>array('192.168.56.101'),
+ *         ),
+ *         'router'=>array(
+ *             'class'=>'WorkerRouter',
+ *             'routes'=>array(
+ *                 'reverse'=>'application.controllers.gearman',
+ *             ),
+ *         ),
+ *    ),
+ * );
+ * </code>
+ *
+ * @see WorkerDaemon
+ * @see WorkerRoute
+ * @see WorkerController
+ * @see AbstractWorkerAction
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @package ext.worker
- * @version 0.1 15.01.11 12:46
- * @since 0.1
+ * @version 0.2
+ * @since 0.2
  */
 class WorkerApplication extends CApplication implements IWorkerApplication
 {

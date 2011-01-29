@@ -3,18 +3,19 @@
  * File contains class AbstractWorkerController
  *
  * @author Alexey Korchevsky <mitallast@gmail.com>
- * @link https://github.com/mitallast/yii-worker
+ * @link https://github.com/mitallast/yii-gearman
  * @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
  */
 
 /**
- * Class AbstractWorkerController
+ * Class AbstractWorkerController is the customized base controller class for workers.
+ * All worker controllers must extend from this class or implements interface IWorkerController.
  *
  * @abstract
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @package ext.worker
- * @version 0.1 15.01.11 15:32
- * @since 0.1
+ * @version 0.2
+ * @since 0.2
  */
 abstract class AbstractWorkerController extends CController implements IWorkerController
 {

@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Interface of worker application.
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @package ext.worker
+ * @version 0.2
+ * @since 0.2
+ */
 interface IWorkerApplication
 {
 	/**

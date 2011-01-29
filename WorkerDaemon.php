@@ -1,39 +1,56 @@
 <?php
 /**
-* File contains class WorkerDaemon
-*
-* @author Alexey Korchevsky <mitallast@gmail.com>
-* @link https://github.com/mitallast/yii-worker
-* @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
-*/
+ * File contains class WorkerDaemon
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @link https://github.com/mitallast/yii-gearman
+ * @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
+ */
 
 /**
-* Class WorkerDaemon
-*
-* @author Alexey Korchevsky <mitallast@gmail.com>
-* @package ext.worker
-* @version 0.1 15.01.11 14:58
-* @since 0.1
-*/
+ * Class WorkerDaemon represent API of asynchronous workers.
+ * For use component, you can register it in Yii application config:
+ * <code>
+ * "components" => array(
+ *     "worker" => array(
+ *         "class" => "WorkerDaemon",
+ *         "servers" => array(
+ *             "gearman.loc",  // simple, by address
+ *             "127.0.0.33", // simple, by ip and default port
+ *             array("127.0.0.12",4345), // with custom port
+ *         ),
+ *     ),
+ * ),
+ * </code>
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @package ext.worker
+ * @version 0.2
+ * @since 0.2
+ */
 class WorkerDaemon extends CApplicationComponent implements IWorkerDaemon
 {
 	private $_worker;
 	private $_callbackHash = array();
 	private $_active = false;
-
+	/**
+	 * Constructor.
+	 */
 	public function __construct()
 	{
 		$this->_worker = new GearmanWorker();
 	}
 	/**
-	 * Start run worker.
+	 * Start run worker. Before run, method automatically set active to true.
+	 *
+	 * If need stop worker, code must call setActive(false), and worker stops after work cycle end.
 	 */
 	public function run()
 	{
 		/** @var $worker GearmanWorker */
 		$worker = $this->_worker;
 		$this->setActive(true);
-		
+
 		while($worker->work() && $this->getActive())
 		{
 			if ($worker->returnCode() != GEARMAN_SUCCESS)
@@ -53,6 +70,8 @@ class WorkerDaemon extends CApplicationComponent implements IWorkerDaemon
 		$this->_active = (bool)$active;
 	}
 	/**
+	 * Check is daemon in running.
+	 *
 	 * @return bool
 	 */
 	public function getActive()
@@ -62,7 +81,7 @@ class WorkerDaemon extends CApplicationComponent implements IWorkerDaemon
 	/**
 	 * Magic caller to worker function router.
 	 * Routes callbacks in daemon.
-	 * 
+	 *
 	 * @param string $functionName
 	 * @param array $params
 	 */
@@ -82,6 +101,8 @@ class WorkerDaemon extends CApplicationComponent implements IWorkerDaemon
 		    ));
 	}
 	/**
+	 * Register command callback in worker daemon.
+	 *
 	 * @param string $commandName
 	 * @param mixed $callback
 	 */
@@ -91,12 +112,15 @@ class WorkerDaemon extends CApplicationComponent implements IWorkerDaemon
 		$this->_worker->addFunction($commandName,array($this, $commandName));
 	}
 	/**
+	 * Unregister command in daemon by name and remove callback.
+	 *
 	 * @param string $commandName
 	 * @return void
 	 */
 	public function removeCommand($commandName)
 	{
 		$this->_worker->unregister($commandName);
+		unset($this->_callbackHash[strtolower($commandName)]);
 	}
 	/**
 	 * Set server config list.

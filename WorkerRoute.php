@@ -1,20 +1,21 @@
 <?php
 /**
-* File contains class WorkerRoute
-*
-* @author Alexey Korchevsky <mitallast@gmail.com>
-* @link https://github.com/mitallast/yii-worker
-* @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
-*/
+ * File contains class WorkerRoute
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @link https://github.com/mitallast/yii-gearman
+ * @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
+ */
 
 /**
-* Class WorkerRoute
-*
-* @author Alexey Korchevsky <mitallast@gmail.com>
-* @package ext.worker
-* @version 0.1 15.01.11 13:17
-* @since 0.1
-*/
+ * Class WorkerRoute. Contains worker API command name, and route to controller action.
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @see WorkerRouter
+ * @package ext.worker
+ * @version 0.2
+ * @since 0.2
+ */
 class WorkerRoute extends CComponent implements IWorkerRoute
 {
 	private $_commandName;
@@ -27,29 +28,13 @@ class WorkerRoute extends CComponent implements IWorkerRoute
 	 */
 	public function __construct($commandName, $controllerId, $actionId)
 	{
-		if(!strlen($commandName))
-			throw new CException(Yii::t(
-				'worker',
-				'$commandName is empty'
-			));
-
-		if(!strlen($controllerId))
-			throw new CException(Yii::t(
-				'worker',
-				'$controllerId is empty'
-			));
-
-		if(!strlen($actionId))
-			throw new CException(Yii::t(
-				'worker',
-				'$controllerId is empty'
-			));
-		
 		$this->_commandName = (string)$commandName;
 	    $this->_controllerId = (string)$controllerId;
 	    $this->_actionId = (string)$actionId;
 	}
 	/**
+	 * Get controller action id.
+	 *
 	 * @return string
 	 */
 	public function getActionId()
@@ -57,17 +42,20 @@ class WorkerRoute extends CComponent implements IWorkerRoute
 		return $this->_actionId;
 	}
 	/**
-	 * @return string
-	 */
-	public function getCommandName()
-	{
-		return $this->_commandName;
-	}
-	/**
+	 * Get controller id.
 	 * @return string
 	 */
 	public function getControllerId()
 	{
 		return $this->_controllerId;
+	}
+	/**
+	 * Get worker API command name.
+	 *
+	 * @return string
+	 */
+	public function getCommandName()
+	{
+		return $this->_commandName;
 	}
 }
