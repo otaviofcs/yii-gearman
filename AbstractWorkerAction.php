@@ -5,6 +5,7 @@
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @link https://github.com/mitallast/yii-gearman
  * @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
+ * @license https://github.com/mitallast/yii-gearman/blob/master/license
  */
 
 /**

@@ -5,6 +5,7 @@
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @link https://github.com/mitallast/yii-gearman
  * @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
+ * @license https://github.com/mitallast/yii-gearman/blob/master/license
  */
 
 require_once "Interfaces.php";
@@ -66,6 +67,8 @@ require_once "Interfaces.php";
  * @package ext.worker
  * @version 0.2
  * @since 0.2
+ *
+ * @param
  */
 class WorkerApplication extends CApplication implements IWorkerApplication
 {
@@ -188,12 +191,83 @@ class WorkerApplication extends CApplication implements IWorkerApplication
 		}
 	}
 	/**
+	 * Displays the captured PHP error.
+	 * This method displays the error in console mode when there is
+	 * no active error handler.
+	 * @param integer $code error code
+	 * @param string $message error message
+	 * @param string $file error file
+	 * @param string $line error line
+	 */
+	public function displayError($code,$message,$file,$line)
+	{
+		echo "PHP Error[$code]: $message\n";
+		echo "    in file $file at line $line\n";
+		$trace=debug_backtrace();
+		// skip the first 4 stacks as they do not tell the error position
+		if(count($trace)>4)
+			$trace=array_slice($trace,4);
+		foreach($trace as $i=>$t)
+		{
+			if(!isset($t['file']))
+				$t['file']='unknown';
+			if(!isset($t['line']))
+				$t['line']=0;
+			if(!isset($t['function']))
+				$t['function']='unknown';
+			echo "#$i {$t['file']}({$t['line']}): ";
+			if(isset($t['object']) && is_object($t['object']))
+				echo get_class($t['object']).'->';
+			echo "{$t['function']}()\n";
+		}
+	}
+	/**
+	 * Displays the uncaught PHP exception.
+	 * This method displays the exception in console mode when there is
+	 * no active error handler.
+	 * @param Exception $exception the uncaught exception
+	 */
+	public function displayException($exception)
+	{
+		if(YII_DEBUG)
+		{
+			echo get_class($exception) . "\n";
+			echo $exception->getMessage() . ' (' . $exception->getFile() . ' : ' . $exception->getLine() . "\n";
+			echo $exception->getTraceAsString() . "\n";
+		}
+		else
+		{
+			echo get_class($exception) . "\n";
+			echo $exception->getMessage() . "\n";
+		}
+	}
+	/**
+	 * Registers the core application components.
+	 * This method overrides the parent implementation by registering additional core components.
+	 * @see setComponents
+	 */
+	protected function registerCoreComponents()
+	{
+		parent::registerCoreComponents();
+
+		$components = array(
+			'worker' => array(
+				'class' => 'WorkerDaemon',
+			),
+			'router' => array(
+				'class' => 'WorkerRouter',
+			),
+		);
+
+		$this->setComponents($components);
+	}
+	/**
 	 * Parse contoller id string and return controller class instance.
 	 * 
 	 * @param string $controllerId
 	 * @return IWorkerController
 	 */
-	private function createController($controllerId)
+	protected function createController($controllerId)
 	{
 		$controllerId = trim($controllerId);
 		

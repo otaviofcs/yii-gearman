@@ -1,4 +1,12 @@
 <?php
+/**
+ * File contains all interfaces to worker components.
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @link https://github.com/mitallast/yii-gearman
+ * @copyright Alexey Korchevsky <mitallast@gmail.com> 2010-2011
+ * @license https://github.com/mitallast/yii-gearman/blob/master/license
+ */
 
 /**
  * Interface of worker application.
@@ -7,6 +15,7 @@
  * @package ext.worker
  * @version 0.2
  * @since 0.2
+ * @see WorkerApplication
  */
 interface IWorkerApplication
 {
@@ -37,6 +46,15 @@ interface IWorkerApplication
 	public function runCommand(IWorkerJob $command);
 }
 
+/**
+ * Interface of worker daemon component.
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @package ext.worker
+ * @version 0.2
+ * @since 0.2
+ * @see WorkerDaemon
+ */
 interface IWorkerDaemon extends IApplicationComponent
 {
 	/**
@@ -64,6 +82,15 @@ interface IWorkerDaemon extends IApplicationComponent
 	public function removeCommand($commandName);
 }
 
+/**
+ * Interface of worker job object.
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @package ext.worker
+ * @version 0.2
+ * @since 0.2
+ * @see WorkerJob
+ */
 interface IWorkerJob
 {
 	/**
@@ -96,6 +123,15 @@ interface IWorkerJob
 	public function sendException($exception);
 }
 
+/**
+ * Interface of worker router component.
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @package ext.worker
+ * @version 0.2
+ * @since 0.2
+ * @see WorkerRouter
+ */
 interface IWorkerRouter extends IApplicationComponent
 {
 	/**
@@ -122,6 +158,15 @@ interface IWorkerRouter extends IApplicationComponent
 	public function getRoute($command);
 }
 
+/**
+ * Interface of worker router route rule.
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @package ext.worker
+ * @version 0.2
+ * @since 0.2
+ * @see WorkerRoute
+ */
 interface IWorkerRoute
 {
 	/**
@@ -148,6 +193,15 @@ interface IWorkerRoute
 	public function getActionId();
 }
 
+/**
+ * Interface of worker abstract action component.
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @package ext.worker
+ * @version 0.2
+ * @since 0.2
+ * @see AbstractWorkerAction
+ */
 interface IWorkerAction extends IAction
 {
 	/**
@@ -162,6 +216,15 @@ interface IWorkerAction extends IAction
 	public function getJob();
 }
 
+/**
+ * Interface of worker controller.
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @package ext.worker
+ * @version 0.2
+ * @since 0.2
+ * @see AbstractWorkerController
+ */
 interface IWorkerController
 {
 	/**
