@@ -18,7 +18,7 @@
  *
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @package ext.worker
- * @version 0.2
+ * @version 0.3
  * @since 0.2
  */
 class WorkerJob extends CComponent implements IWorkerJob
@@ -42,7 +42,6 @@ class WorkerJob extends CComponent implements IWorkerJob
 	{
 		return $this->job->functionName();
 	}
-
 	/**
 	 * Get stream identifier.
 	 *
@@ -52,7 +51,6 @@ class WorkerJob extends CComponent implements IWorkerJob
 	{
 		return $this->job->unique();
 	}
-
 	/**
 	 * Get data sending by task creator.
 	 *
@@ -62,7 +60,6 @@ class WorkerJob extends CComponent implements IWorkerJob
 	{
 		return $this->job->workload();
 	}
-
 	/**
 	 * Sends result data and the complete status update for this job.
      *
@@ -74,7 +71,6 @@ class WorkerJob extends CComponent implements IWorkerJob
 	{
 		return $this->job->sendComplete($data);
 	}
-
 	/**
 	 * Send exception to server or client error message.
 	 *

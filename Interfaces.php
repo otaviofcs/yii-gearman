@@ -9,49 +9,11 @@
  */
 
 /**
- * Interface of worker application.
- *
- * @author Alexey Korchevsky <mitallast@gmail.com>
- * @package ext.worker
- * @version 0.2
- * @since 0.2
- * @see WorkerApplication
- */
-interface IWorkerApplication
-{
-	/**
-	 * @abstract
-	 * @return IWorkerDaemon
-	 */
-	public function getWorker();
-	/**
-	 * @abstract
-	 * @param IWorkerDaemon $worker
-	 */
-	public function setWorker($worker);
-	/**
-	 * @abstract
-	 * @return IWorkerRouter
-	 */
-	public function getRouter();
-	/**
-	 * @abstract
-	 * @param IWorkerRouter $router
-	 */
-	public function setRouter($router);
-	/**
-	 * @abstract
-	 * @param IWorkerJob $command
-	 */
-	public function runCommand(IWorkerJob $command);
-}
-
-/**
  * Interface of worker daemon component.
  *
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @package ext.worker
- * @version 0.2
+ * @version 0.3
  * @since 0.2
  * @see WorkerDaemon
  */
@@ -87,7 +49,7 @@ interface IWorkerDaemon extends IApplicationComponent
  *
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @package ext.worker
- * @version 0.2
+ * @version 0.3
  * @since 0.2
  * @see WorkerJob
  */
@@ -124,113 +86,18 @@ interface IWorkerJob
 }
 
 /**
- * Interface of worker router component.
+ * Interface of worker command.
  *
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @package ext.worker
- * @version 0.2
- * @since 0.2
- * @see WorkerRouter
+ * @version 0.3
+ * @since 0.3
+ * @see WorkerCommand
  */
-interface IWorkerRouter extends IApplicationComponent
+interface IWorkerCommand
 {
 	/**
 	 * @abstract
-	 * @param array $routes
 	 */
-	public function setRoutes(array $routes);
-	/**
-	 * @abstract
-	 * @param string $commandName
-	 * @param array|IWorkerRoute $route
-	 * @return void
-	 */
-	public function setRoute($commandName, $route);
-	/**
-	 * @abstract
-	 * @return IWorkerRoute[]
-	 */
-	public function getRoutes();
-	/**
-	 * @param IWorkerJob|string $command
-	 * @return IWorkerRoute
-	 */
-	public function getRoute($command);
-}
-
-/**
- * Interface of worker router route rule.
- *
- * @author Alexey Korchevsky <mitallast@gmail.com>
- * @package ext.worker
- * @version 0.2
- * @since 0.2
- * @see WorkerRoute
- */
-interface IWorkerRoute
-{
-	/**
-	 * @abstract
-	 * @param string $commandName
-	 * @param string $controllerId
-	 * @param string $actionId
-	 */
-	public function __construct($commandName, $controllerId, $actionId);
-	/**
-	 * @abstract
-	 * @return string
-	 */
-	public function getCommandName();
-	/**
-	 * @abstract
-	 * @return string
-	 */
-	public function getControllerId();
-	/**
-	 * @abstract
-	 * @return string
-	 */
-	public function getActionId();
-}
-
-/**
- * Interface of worker abstract action component.
- *
- * @author Alexey Korchevsky <mitallast@gmail.com>
- * @package ext.worker
- * @version 0.2
- * @since 0.2
- * @see AbstractWorkerAction
- */
-interface IWorkerAction extends IAction
-{
-	/**
-	 * @abstract
-	 * @param IWorkerJob $job
-	 */
-	public function setJob($job);
-	/**
-	 * @abstract
-	 * @return IWorkerJob
-	 */
-	public function getJob();
-}
-
-/**
- * Interface of worker controller.
- *
- * @author Alexey Korchevsky <mitallast@gmail.com>
- * @package ext.worker
- * @version 0.2
- * @since 0.2
- * @see AbstractWorkerController
- */
-interface IWorkerController
-{
-	/**
-	 * @abstract
-	 * @param string $actionId
-	 * @return IWorkerAction
-	 */
-	public function createAction($actionId);
+	public function run(IWorkerJob $job);
 }

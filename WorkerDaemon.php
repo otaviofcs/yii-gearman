@@ -26,7 +26,7 @@
  *
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @package ext.worker
- * @version 0.2
+ * @version 0.3
  * @since 0.2
  */
 class WorkerDaemon extends CApplicationComponent implements IWorkerDaemon
@@ -62,6 +62,32 @@ class WorkerDaemon extends CApplicationComponent implements IWorkerDaemon
 		}
 	}
 	/**
+	 * Magic function is runner worker command.
+	 *
+	 * @throws WorkerDaemonException
+	 * @param string $name
+	 * @param array $params
+	 */
+	public function __call($name, $params)
+	{
+		if(isset($this->_callbackHash[$name]))
+		{
+			try
+			{
+				/** @var $command IWorkerCommand */
+				$command = $this->_callbackHash[$name];
+				$job = new WorkerJob($params[0]);
+				$command->run($job);
+			}
+			catch(Exception $error)
+			{
+				$job->sendException($error);
+			}
+		}
+		else
+			throw new WorkerDaemonException(Yii::t("worker","Function not found"));
+	}
+	/**
 	 * Set daemon activity. If it started, this method is stopped it after cycle complete.
 	 *
 	 * @param bool $active
@@ -80,36 +106,14 @@ class WorkerDaemon extends CApplicationComponent implements IWorkerDaemon
 		return $this->_active;
 	}
 	/**
-	 * Magic caller to worker function router.
-	 * Routes callbacks in daemon.
-	 *
-	 * @param string $functionName
-	 * @param array $params
-	 */
-	public function __call($functionName, $params)
-	{
-		if(isset($this->_callbackHash[strtolower($functionName)]))
-		{
-			$callback = $this->_callbackHash[strtolower($functionName)];
-		    $job = new WorkerJob($params[0]);
-			return call_user_func($callback, $job);
-		}
-	    else
-		    throw new CException(Yii::t(
-			    'worker',
-			    'Call to undefined method "{method}"',
-			    array('{method}' => $functionName)
-		    ));
-	}
-	/**
 	 * Register command callback in worker daemon.
 	 *
 	 * @param string $commandName
 	 * @param mixed $callback
 	 */
-	public function setCommand($commandName, $callback)
+	public function setCommand($commandName, IWorkerCommand $command)
 	{
-		$this->_callbackHash[strtolower($commandName)] = $callback;
+		$this->_callbackHash[$commandName] = $command;
 		$this->_worker->addFunction($commandName,array($this, $commandName));
 	}
 	/**
@@ -120,8 +124,8 @@ class WorkerDaemon extends CApplicationComponent implements IWorkerDaemon
 	 */
 	public function removeCommand($commandName)
 	{
+		unset($this->_callbackHash[$commandName]);
 		$this->_worker->unregister($commandName);
-		unset($this->_callbackHash[strtolower($commandName)]);
 	}
 	/**
 	 * Set server config list.
@@ -202,3 +206,13 @@ class WorkerDaemon extends CApplicationComponent implements IWorkerDaemon
 		$this->_worker->setTimeout($timeout);
 	}
 }
+
+/**
+ * Class WorkerDaemonException is the base for all worker exception
+ *
+ * @author Alexey Korchevsky <mitallast@gmail.com>
+ * @package ext.worker
+ * @version 0.3
+ * @since 0.3
+ */
+class WorkerDaemonException extends CException{}

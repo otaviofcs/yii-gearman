@@ -23,16 +23,13 @@ return array(
 	"import"=>array(
 		"ext.worker.*",
 	),
+	"commandMap" => array(
+		"revert" => "StringRevertCommand",
+	),
 	"components"=>array(
 		"worker"=>array(
 			"class"=>"WorkerDaemon",
 			"servers"=>array("127.0.0.1"),
-		),
-		"router"=>array(
-			"class"=>"WorkerRouter",
-			"routes"=>array(
-				"reverse"=>"application.controllers.gearman",
-			),
 		),
 	),
 );
@@ -50,11 +47,11 @@ require_once("extensions/worker/WorkerApplication.php");
 Yii::createApplication("WorkerApplication", $config)->run();
 </code>
 
-Добавим контроллер:
+Добавим команду:
 <code>
-class WorkerController extends AbstractWorkerController
+class StringRevertCommand extends WorkerCommand
 {
-	public function actionReverse(WorkerJob $job)
+	public function process(WorkerJob $job)
 	{
 		$job->sendComplete($job->getWorkload());
 	    echo $job->getWorkload();

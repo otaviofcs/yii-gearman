@@ -49,12 +49,6 @@ require_once "Interfaces.php";
  *             'class'=>'WorkerDaemon',
  *             'servers'=>array('192.168.56.101'),
  *         ),
- *         'router'=>array(
- *             'class'=>'WorkerRouter',
- *             'routes'=>array(
- *                 'reverse'=>'application.controllers.gearman',
- *             ),
- *         ),
  *    ),
  * );
  * </code>
@@ -65,17 +59,25 @@ require_once "Interfaces.php";
  * @see AbstractWorkerAction
  * @author Alexey Korchevsky <mitallast@gmail.com>
  * @package ext.worker
- * @version 0.2
+ * @version 0.3
  * @since 0.2
  *
  * @param
  */
-class WorkerApplication extends CApplication implements IWorkerApplication
+class WorkerApplication extends CApplication
 {
 	/**
-	 * @return string the ID of the default controller. Defaults to 'worker'.
+	 * Hash config. Map worker function to command name.
+	 * <code>
+	 * array(
+	 *   "strrevert" => "application.commands.StringRevertCommand",
+	 *   "strtrim" => "StringTrimCommand",
+	 * )
+	 * </code>
+	 *
+	 * @var array
 	 */
-	public $defaultController = 'worker';
+	public $commandMap = array();
 
 	/**
 	 * Start worker cycle.
@@ -93,12 +95,18 @@ class WorkerApplication extends CApplication implements IWorkerApplication
 	 */
 	public function processRequest()
 	{
-		$routes = $this->getRouter()->getRoutes();
-	    $worker = $this->getWorker();
+		$worker = $this->getWorker();
 
-	    foreach($routes as $route)
+	    foreach($this->commandMap as $commandName => $alias)
 	    {
-		    $worker->setCommand($route->getCommandName(), array($this, 'runCommand'));
+			Yii::import($alias);
+			if($pos=strrpos($alias,'.'))
+				$class = (string)substr($alias,$pos+1);
+			else
+				$class = $alias;
+
+			$command = new $class;
+		    $worker->setCommand($commandName, array($command, 'run'));
 	    }
 
 	    $worker->run();
@@ -123,72 +131,6 @@ class WorkerApplication extends CApplication implements IWorkerApplication
 	public function setWorker($worker)
 	{
 		$this->setComponent("worker", $worker);
-	}
-	/**
-	 * Get worker route component.
-	 * Also you can call $app->getComponent("router") or $app->router.
-	 *
-	 * @return IWorkerRouter
-	 * @see getComponent
-	 */
-	public function getRouter()
-	{
-		return $this->getComponent("router");
-	}
-	/**
-	 * Set worker route component.
-	 * Also you can call $app->setComponent("router", $component) or $app->router = $component.
-	 *
-	 * @param mixed $router
-	 * @return void
-	 */
-	public function setRouter($router)
-	{
-		$this->setComponent("router", $router);
-	}
-	/**
-	 * Default callback worker daemon.
-	 * It's calls when worker get new job and router have not custom callback.
-	 *
-	 * @param IWorkerJob $job
-	 */
-	public function runCommand(IWorkerJob $job)
-	{
-		try{
-			$route = $this->getRouter()->getRoute($job);
-
-			if(is_null($route))
-			{
-				$controllerId = $this->defaultController;
-			    $actionId = $job->getCommandName();
-			}
-			else
-			{
-				$controllerId = $route->getControllerId();
-			    $actionId = $route->getCommandName();
-			}
-
-
-			$controller = $this->createController($controllerId);
-			$controller->init();
-			
-			/** @var $action IWorkerAction */
-			$action = $controller->createAction($actionId);
-			if($action instanceof IWorkerAction)
-			{
-				$action->setJob($job);
-			    $action->run();
-			}
-			else throw new CException(Yii::t(
-				"worker",
-				"Action is not instance of IWorkerAction"
-			));
-		}
-		catch(Exception $e)
-		{
-			$job->sendException($e);
-		    throw $e;
-		}
 	}
 	/**
 	 * Displays the captured PHP error.
@@ -254,70 +196,8 @@ class WorkerApplication extends CApplication implements IWorkerApplication
 			'worker' => array(
 				'class' => 'WorkerDaemon',
 			),
-			'router' => array(
-				'class' => 'WorkerRouter',
-			),
 		);
 
 		$this->setComponents($components);
-	}
-	/**
-	 * Parse contoller id string and return controller class instance.
-	 * 
-	 * @param string $controllerId
-	 * @return IWorkerController
-	 */
-	protected function createController($controllerId)
-	{
-		$controllerId = trim($controllerId);
-		
-		if(!strlen($controllerId))
-		    throw new InvalidArgumentException(Yii::t("worker", "Invalid controller id"));
-
-	    $path = null;
-	    $className = null;
-	    $classFile = null;
-	    if(strpos($controllerId, '.'))
-	    {
-		    $lastDot = strrpos($controllerId, '.');
-			$path = substr($controllerId, 0, $lastDot);
-	        $className = $controllerId = substr($controllerId, $lastDot+1);
-	    }
-		else
-			$className = $controllerId;
-
-	    if(!strpos($className, "Controller"))
-	    {
-		    $className = ucfirst($className) . "Controller";
-	    }
-		if($path)
-	        $classFile = $path . '.' . $className;
-		else
-			$classFile = $className;
-
-	    if(!class_exists($className, false))
-	    {
-		    Yii::import($classFile, true);
-	    }
-
-	    if(class_exists($className,false))
-		{
-			if(is_subclass_of($className,'CController'))
-			{
-				return new $className($controllerId);
-			}
-		    else
-			    throw new CException(Yii::t(
-				    "worker",
-				    "Class \"{class}\" is not subclass of CController",
-				    array("{class}" => $className)
-			    ));
-		}
-	    else
-		    throw new CException(Yii::t(
-			    "worker",
-			    "Class \"{class}\" is not found",
-			    array("{class}" => $className)
-		    ));
 	}
 }
